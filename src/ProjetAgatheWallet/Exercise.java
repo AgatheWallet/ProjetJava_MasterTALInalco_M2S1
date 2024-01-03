@@ -13,6 +13,8 @@ import java.util.regex.*;
 public class Exercise {
     private List<String> questions;
     private List<String> answers;
+    private List<String> questionsAnswers;
+    private String author;
     private File exercisesDatabase;
 
     public Exercise(Language language, Level level) throws IOException {
@@ -21,21 +23,37 @@ public class Exercise {
         BufferedReader br = new BufferedReader(new FileReader(this.exercisesDatabase));
         this.questions = new ArrayList<>();
         this.answers = new ArrayList<>();
+        this.questionsAnswers = new ArrayList<>();
         String line;
-        Pattern pattern = Pattern.compile("([^#]*?)#([^#]*?)#([^#]*)");
+        Pattern patternQA = Pattern.compile("([^#]*?)#([^#]*?)#([^#]*)");
+        Pattern patternCreator = Pattern.compile("created by: (.*)");
         while ((line = br.readLine()) != null) {
-            Matcher matchPattern = pattern.matcher(line);
-            String question = null;
-            String answer = null;
-            if (matchPattern.find()) {
-                question = matchPattern.group(1) + "_________" + matchPattern.group(3);
-                answer = matchPattern.group(2);
+            if (line.startsWith("created")) {
+                Matcher matchPatternCreator = patternCreator.matcher(line);
+                if (matchPatternCreator.find()) {
+                    this.author = matchPatternCreator.group(1);
+                }
+            } else {
+                questionsAnswers.add(line);
+                Matcher matchPatternQA = patternQA.matcher(line);
+                String question = "";
+                String answer = "";
+                if (matchPatternQA.find()) {
+                    question = matchPatternQA.group(1) + "_________" + matchPatternQA.group(3);
+                    answer = matchPatternQA.group(2);
+                }
+                this.questions.add(question);
+                this.answers.add(answer);
             }
-            this.questions.add(question);
-            this.answers.add(answer);
         }
     }
 
+    public List<String> getExercise() {
+        return this.questionsAnswers;
+    }
+    public String getAuthor() {
+        return author;
+    }
     private String generateAnswers() {
         StringBuilder answers = new StringBuilder();
         List<String> answerList = new ArrayList<>(this.answers);
@@ -64,10 +82,11 @@ public class Exercise {
     public float evaluate(List<String> userAnswers) {
         float pointsPerQuestion = (float) 20 / userAnswers.size();
         float scoreUser = 0;
+        System.out.println("Answers:");
         for (int i = 0; i < userAnswers.size(); i++) {
             String userAns = userAnswers.get(i);
             String correctAns = this.answers.get(i);
-            System.out.println(userAns + " // " + correctAns);
+            System.out.println(correctAns);
             if (userAns.equals(correctAns)) {
                 scoreUser = scoreUser + pointsPerQuestion;
             }

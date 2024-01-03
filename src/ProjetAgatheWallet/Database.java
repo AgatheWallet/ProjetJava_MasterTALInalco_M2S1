@@ -38,7 +38,7 @@ public class Database {
         this.usersInfo.add(newUser);
         String id = newUser.getId();
         idList.add(id);
-        String userData = newUser.getId() + "," + newUser.getName() + "," + newUser.getPassword() + "," + newUser.getRole() +  "," + newUser.getLanguage() +  "," + newUser.getLevel() + "," + newUser.getProgress();
+        String userData = newUser.getId() + "," + newUser.getName() + "," + newUser.getPassword() + "," + newUser.getRole() +  "," + newUser.getLanguage() +  "," + newUser.getLevel() + "," + newUser.getCurrentScore();
         try (FileWriter writer = new FileWriter(database, true)) {
             writer.write(userData + System.lineSeparator());
         } catch (IOException e) {

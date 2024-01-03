@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.function.ToLongBiFunction;
 
 public class UserInterface {
     private User currentUser;
@@ -12,6 +13,7 @@ public class UserInterface {
     private List<String> idList = usersDatabase.getIdList();
     private List<User> usersInfos = usersDatabase.getUsersInfo();
     private static Scanner scanner = new Scanner(System.in);
+    private Tools tools = new Tools();
 
     public UserInterface() throws IOException {
         System.out.println();
@@ -26,7 +28,7 @@ public class UserInterface {
         boolean continueRunning = true;
         while (continueRunning) {
             System.out.println();
-            System.out.println("What do you want to do?");
+            System.out.println("What do you want to do? Please type the corresponding number.");
             System.out.println("1. Login");
             System.out.println("2. Create an account");
 
@@ -45,6 +47,8 @@ public class UserInterface {
                         if (user.getId().equals(id) && user.getPassword().equals(password)) {
                             currentUser = user;
                             continueRunning = false;
+                        } else if (user.getId().equals(id) && ! user.getPassword().equals(password)) {
+                            System.out.println("Id or/and password wrong. Please try again.");
                         }
                     }
                 } else {
@@ -87,7 +91,7 @@ public class UserInterface {
                     if (secondChoice == 1) {
                         roleUser = Role.STUDENT;
                         System.out.println();
-                        System.out.println("Which language do you want to learn:");
+                        System.out.println("Which language do you want to learn?");
                         System.out.println("1. French");
                         System.out.println("2. English");
                         System.out.println("3. Korean");
@@ -197,7 +201,7 @@ public class UserInterface {
                     Level exerciseLevel = currentUser.getLevel();
                     if (currentUser.getLevel().equals(Level.INTERMEDIATE)) {
                         System.out.println();
-                        System.out.println("Please choose the desired level for the exercise:");
+                        System.out.println("Please choose the desired level for the exercise by typing the corresponding number:");
                         System.out.println("1. Beginner");
                         System.out.println("2. Intermediate");
                         int levelNb = scanner.nextInt();
@@ -217,7 +221,7 @@ public class UserInterface {
                         }
                     } else if (currentUser.getLevel().equals(Level.ADVANCED)) {
                         System.out.println();
-                        System.out.println("Please choose the desired level for the exercise:");
+                        System.out.println("Please choose the desired level for the exercise by typing the corresponding number:");
                         System.out.println("1. Beginner");
                         System.out.println("2. Intermediate");
                         System.out.println("3. Advanced");
@@ -251,12 +255,13 @@ public class UserInterface {
                         answers.add(scanner.nextLine());
                     }
                     float score = exo.evaluate(answers);
-                    currentUser.setProgress((currentUser.getProgress() + score)/2);
+                    currentUser.addScore(score);
                     usersDatabase.updateDatabase(currentUser);
                     break;
                 case 2:
                     System.out.println();
-                    System.out.println("Your level is " + currentUser.getLevel() + " with a score of " + currentUser.getProgress());
+                    System.out.println("Your level is " + currentUser.getLevel() + " with a score of " + currentUser.getCurrentScore());
+                    System.out.println("Here is a view of your progress: " + tools.mapToString(currentUser.getProgress()));
                     break;
                 case 3:
                     System.out.println();
@@ -311,7 +316,7 @@ public class UserInterface {
                 case 2:
                     for (User student : usersInfos) {
                         if (student.getRole().equals(Role.STUDENT) && student.getLanguage().equals(currentUser.getLanguage())) {
-                            System.out.println("Student " + student.getName() + ": " + student.getLevel() + " level with " + student.getProgress());
+                            System.out.println("Student " + student.getName() + ": " + student.getLevel() + " level with " + student.getCurrentScore());
                         }
                     }
                     break;

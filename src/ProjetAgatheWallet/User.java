@@ -1,6 +1,8 @@
 package ProjetAgatheWallet;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class User {
@@ -11,7 +13,9 @@ public class User {
     protected Database db;
     private Language language;
     private Level lvl;
-    private float progress;
+    //private float currentScore;
+    private Map<Level, List<Float>> progress;
+    private Tools tool = new Tools();
 
     public User(String[] userInfo){
         this.id = userInfo[0];
@@ -20,11 +24,11 @@ public class User {
         this.role = Role.valueOf(userInfo[3]);
         this.language = Language.valueOf(userInfo[4]);
         this.lvl = Level.valueOf(userInfo[5]);
-        this.progress = Float.parseFloat((userInfo[6]));
+        this.progress = tool.stringToMap(userInfo[6]);
     }
 
     public String[] getUser() {
-        return new String[] {id, name, password, String.valueOf(role), String.valueOf(language), String.valueOf(lvl), String.valueOf(progress)};
+        return new String[] {id, name, password, String.valueOf(role), String.valueOf(language), String.valueOf(lvl), tool.mapToString(progress)};
     }
     public void getUserProfile(){
         System.out.println("User's id: " + this.id);
@@ -65,10 +69,6 @@ public class User {
         return language;
     }
 
-    public void setLanguage(Language language) {
-        this.language = language;
-    }
-
     public Level getLevel() {
         return lvl;
     }
@@ -77,12 +77,24 @@ public class User {
         this.lvl = newLvl;
     }
 
-    public float getProgress() {
+    public Map<Level, List<Float>> getProgress() {
         return progress;
     }
 
-    public void setProgress(float newPoints) {
-        this.progress = newPoints;
+    public void addScore(float newScore) {
+        List<Float> scoreList = progress.get(lvl);
+        scoreList.add(newScore);
+    }
+
+    public void addNewLevel(Level newLevel) {
+        List<Float> newScoreList = new ArrayList<>();
+        newScoreList.add((float) 0.0);
+        progress.put(newLevel, newScoreList);
+    }
+
+    public float getCurrentScore() {
+        List<Float> scoreList = progress.get(lvl);
+        return scoreList.get(scoreList.size() - 1);
     }
 
     public void updateProfile() {
