@@ -1,0 +1,7 @@
+Ils se sont #lavés#.
+Ils se sont #lavé# les pieds.
+Le chat #mangea# la souris.
+La souris #fut  mangée#  par le chat.
+Information : La navigatrice a mis 49 jours pour faire le tour du monde à la voile. → La navigatrice 49 jours #aurait mis# pour faire le tour du monde à la voile.
+Information : Une femme est décédée. Son mari l'a empoisonnée → Une femme #serait décédée# car son mari l'#aurait empoisonnée#.
+J'avais peur que la souris #ait été mangée# par le chat.
