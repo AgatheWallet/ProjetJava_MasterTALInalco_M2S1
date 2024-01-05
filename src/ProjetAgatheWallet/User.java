@@ -13,7 +13,6 @@ public class User {
     protected Database db;
     private Language language;
     private Level lvl;
-    //private float currentScore;
     private Map<Level, List<Float>> progress;
     private Tools tool = new Tools();
 
@@ -73,20 +72,17 @@ public class User {
         return lvl;
     }
 
-    public void setLevel(Level newLvl) {
-        this.lvl = newLvl;
-    }
-
     public Map<Level, List<Float>> getProgress() {
         return progress;
     }
 
-    public void addScore(float newScore) {
-        List<Float> scoreList = progress.get(lvl);
+    public void addScore(Level exerciseLvl, float newScore) {
+        List<Float> scoreList = progress.get(exerciseLvl);
         scoreList.add(newScore);
     }
 
-    public void addNewLevel(Level newLevel) {
+    public void setLevel(Level newLevel) {
+        this.lvl = newLevel;
         List<Float> newScoreList = new ArrayList<>();
         newScoreList.add((float) 0.0);
         progress.put(newLevel, newScoreList);
@@ -106,7 +102,6 @@ public class User {
             System.out.println("1. Update id");
             System.out.println("2. Update name");
             System.out.println("3. Change password");
-            System.out.println("4. Exit");
 
             int choice = scanner.nextInt();
             scanner.nextLine();
@@ -125,19 +120,18 @@ public class User {
                             System.out.println("This id is already taken, please choose another one.");
                         }
                     }
-
+                    continueRunning = false;
                     break;
                 case 2:
                     System.out.println("What is your name?");
                     String newName = scanner.nextLine();
                     setName(newName);
+                    continueRunning = false;
                     break;
                 case 3:
                     System.out.println("What is your new password?");
                     String newPassword = scanner.nextLine();
                     setPassword(newPassword);
-                    break;
-                case 4:
                     continueRunning = false;
                     break;
                 default:

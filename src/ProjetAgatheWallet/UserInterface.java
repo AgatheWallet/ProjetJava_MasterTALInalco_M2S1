@@ -11,6 +11,7 @@ public class UserInterface {
     private static Scanner scanner = new Scanner(System.in);
     private Tools tools = new Tools();
 
+
     public UserInterface() throws IOException {
         System.out.println();
         System.out.println("Welcome on our learning app.");
@@ -186,6 +187,7 @@ public class UserInterface {
     }
 
     public void displayMainMenuStudent() throws IOException {
+        LevelManager lvlMan = new LevelManager(currentUser.getLanguage());
         boolean continueRunning = true;
         while (continueRunning) {
             System.out.println();
@@ -223,15 +225,15 @@ public class UserInterface {
                             }
                         }
                     } else if (currentUser.getLevel().equals(Level.ADVANCED)) {
-                        System.out.println();
-                        System.out.println("Please choose the desired level for the exercise by typing the corresponding number:");
-                        System.out.println("1. Beginner");
-                        System.out.println("2. Intermediate");
-                        System.out.println("3. Advanced");
-                        int levelNb = scanner.nextInt();
-                        scanner.nextLine();
                         boolean wrongChoice = true;
                         while (wrongChoice) {
+                            System.out.println();
+                            System.out.println("Please choose the desired level for the exercise by typing the corresponding number:");
+                            System.out.println("1. Beginner");
+                            System.out.println("2. Intermediate");
+                            System.out.println("3. Advanced");
+                            int levelNb = scanner.nextInt();
+                            scanner.nextLine();
                             if (levelNb == 1) {
                                 exerciseLevel = Level.BEGINNER;
                                 wrongChoice = false;
@@ -246,6 +248,8 @@ public class UserInterface {
                                 System.out.println("There is no option corresponding to this number. Please try again.");
                             }
                         }
+                    } else {
+                        exerciseLevel = Level.BEGINNER;
                     }
 
                     Exercise exo = new Exercise(currentUser.getLanguage(), exerciseLevel);
@@ -258,7 +262,11 @@ public class UserInterface {
                         answers.add(scanner.nextLine());
                     }
                     float score = exo.evaluate(answers);
-                    currentUser.addScore(score);
+                    currentUser.addScore(exerciseLevel,score);
+                    if (exerciseLevel.equals(currentUser.getLanguage()) && score > lvlMan.getLevelUpdateScore(currentUser.getLevel())) {
+                        lvlMan.getNextLevel(currentUser);
+                        System.out.println("Congratulations, your level has been upgraded to " + currentUser.getLevel());
+                    }
                     usersDatabase.updateDatabase(currentUser);
                     break;
                 case 2:
@@ -300,6 +308,8 @@ public class UserInterface {
     }
 
     public void displayMainMenuTeacher() throws IOException {
+        ExercisesManager exoMan = new ExercisesManager(currentUser.getLanguage());
+        LevelManager lvlMan = new LevelManager(currentUser.getLanguage());
         boolean continueRunning = true;
         while (continueRunning) {
             System.out.println();
@@ -315,16 +325,16 @@ public class UserInterface {
             scanner.nextLine();
             switch (choice) {
                 case 1:
-                    System.out.println();
-                    System.out.println("Choose a level: ");
-                    System.out.println("1. Beginner");
-                    System.out.println("2. Intermediate");
-                    System.out.println("3. Advanced");
-                    int levelChoice = scanner.nextInt();
-                    scanner.nextLine();
                     Level lvlToModify = Level.BEGINNER;
                     boolean wrongChoice = true;
                     while (wrongChoice) {
+                        System.out.println();
+                        System.out.println("Choose a level: ");
+                        System.out.println("1. Beginner");
+                        System.out.println("2. Intermediate");
+                        System.out.println("3. Advanced");
+                        int levelChoice = scanner.nextInt();
+                        scanner.nextLine();
                         if (levelChoice == 1) {
                             wrongChoice = false;
                         } else if (levelChoice == 2) {
@@ -338,22 +348,23 @@ public class UserInterface {
                         }
                     }
 
+                    System.out.println();
                     System.out.println("Choose an option: ");
                     System.out.println("1. Create a new exercise");
                     System.out.println("2. Modify/delete an exercise");
                     System.out.println("3. Set or modify the score to pass a level");
                     int thirdChoice = scanner.nextInt();
                     scanner.nextLine();
-                    ExercisesManager exoMan = new ExercisesManager();
                     switch (thirdChoice) {
                         case 1:
-                            exoMan.createNewExercise(currentUser.getLanguage(), lvlToModify);
+                            exoMan.createNewExercise(lvlToModify);
                             break;
                         case 2:
-                            exoMan.modifyExercise(currentUser.getLanguage(), lvlToModify);
+                            exoMan.modifyExercise(lvlToModify);
                             break;
                         case 3:
-                            exoMan.setScoreToUpdateLevel(currentUser.getLanguage(), lvlToModify);
+                            lvlMan.setScoreToUpdateLevel(lvlToModify);
+                            break;
                     }
                     break;
                 case 2:

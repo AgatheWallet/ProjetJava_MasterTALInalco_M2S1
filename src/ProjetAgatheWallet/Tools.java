@@ -1,9 +1,6 @@
 package ProjetAgatheWallet;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Tools {
     public Tools(){}
@@ -22,7 +19,7 @@ public class Tools {
     }
 
     public Map<Level, List<Float>> stringToMap(String stringProgress) {
-        Map<Level, List<Float>> mapProgress = new HashMap<>();
+        Map<Level, List<Float>> mapProgress = new LinkedHashMap<>();
 
         String[] entries = stringProgress.split("; ");
         for (String entry : entries) {
