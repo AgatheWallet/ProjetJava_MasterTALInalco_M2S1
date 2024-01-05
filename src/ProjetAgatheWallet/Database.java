@@ -1,5 +1,6 @@
 package ProjetAgatheWallet;
 
+import javax.tools.Tool;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,9 +9,10 @@ public class Database {
     private List<User> usersInfo ;
     protected List<String> idList;
     private File database = new File("src/ProjetAgatheWallet/usersDataBase.csv");
+    private Tools tools = new Tools();
 
     public Database() throws IOException {
-        String separator = ",";
+        String separator = "\t";
         BufferedReader br = new BufferedReader(new FileReader(database));
         String line;
         this.idList = new ArrayList<>();
@@ -38,7 +40,7 @@ public class Database {
         this.usersInfo.add(newUser);
         String id = newUser.getId();
         idList.add(id);
-        String userData = newUser.getId() + "," + newUser.getName() + "," + newUser.getPassword() + "," + newUser.getRole() +  "," + newUser.getLanguage() +  "," + newUser.getLevel() + "," + newUser.getCurrentScore();
+        String userData = newUser.getId() + "\t" + newUser.getName() + "\t" + newUser.getPassword() + "\t" + newUser.getRole() +  "\t" + newUser.getLanguage() +  "\t" + newUser.getLevel() + "\t" + tools.mapToString(newUser.getProgress());
         try (FileWriter writer = new FileWriter(database, true)) {
             writer.write(userData + System.lineSeparator());
         } catch (IOException e) {
@@ -56,7 +58,7 @@ public class Database {
             if (line.startsWith(currentUser.getId())) {
                 StringBuilder newUserInfo = new StringBuilder();
                 for (String info : currentUser.getUser()) {
-                    newUserInfo.append(info).append(",");
+                    newUserInfo.append(info).append("\t");
                 }
                 // On enlève la dernière virgule
                 newUserInfo = new StringBuilder(newUserInfo.substring(0, newUserInfo.length() - 1));

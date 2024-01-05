@@ -1,4 +1,3 @@
-created by: null
 Ils se sont #lavés#.
 Ils se sont #lavé# les pieds.
 Le chat #mangea# la souris.

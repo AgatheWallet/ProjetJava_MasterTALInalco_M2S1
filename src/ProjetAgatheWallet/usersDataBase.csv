@@ -1,7 +1,3 @@
-agathewallet,Agathe Wallet,motdepasse1,STUDENT,KOREAN,INTERMEDIATE,0.0
-yoominji,Minji Yoo,motdepasse2,TEACHER,KOREAN,EXPERT,0.0
-florianjacquot,Florian Jacquot,motdepasse3,STUDENT,ENGLISH,ADVANCED,0.0
-tifannynguyen,Tifanny Nguyen,motdepasse4,STUDENT,FRENCH,BEGINNER,0.0
-laura92,Laura Wallet,motdepasse5,STUDENT,FRENCH,BEGINNER,8.57
-DrineDrineRobinson,Sandrine Wallet,motdepasse7,TEACHER,ENGLISH,EXPERT,0.0
-pierreLoulou,Pierre Wallet,motdepasse8,TEACHER,FRENCH,EXPERT,0.0
+agathewallet	Agathe Wallet	motdepasseAgathe	STUDENT	FRENCH	BEGINNER	BEGINNER: [0.0, 17.14]
+leekyung	Kyung Lee	motdepasseLeeKyung	TEACHER	KOREAN	EXPERT	EXPERT: [0.0]
+pierreF	Pierre Fournié	motdepassePierreF	TEACHER	FRENCH	EXPERT	EXPERT: [0.0]

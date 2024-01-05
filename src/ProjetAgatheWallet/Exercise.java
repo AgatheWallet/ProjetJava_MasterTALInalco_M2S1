@@ -14,7 +14,6 @@ public class Exercise {
     private List<String> questions;
     private List<String> answers;
     private List<String> questionsAnswers;
-    private String author;
     private File exercisesDatabase;
 
     public Exercise(Language language, Level level) throws IOException {
@@ -28,31 +27,21 @@ public class Exercise {
         Pattern patternQA = Pattern.compile("([^#]*?)#([^#]*?)#([^#]*)");
         Pattern patternCreator = Pattern.compile("created by: (.*)");
         while ((line = br.readLine()) != null) {
-            if (line.startsWith("created")) {
-                Matcher matchPatternCreator = patternCreator.matcher(line);
-                if (matchPatternCreator.find()) {
-                    this.author = matchPatternCreator.group(1);
-                }
-            } else {
-                questionsAnswers.add(line);
-                Matcher matchPatternQA = patternQA.matcher(line);
-                String question = "";
-                String answer = "";
-                if (matchPatternQA.find()) {
-                    question = matchPatternQA.group(1) + "_________" + matchPatternQA.group(3);
-                    answer = matchPatternQA.group(2);
-                }
-                this.questions.add(question);
-                this.answers.add(answer);
+            questionsAnswers.add(line);
+            Matcher matchPatternQA = patternQA.matcher(line);
+            String question = "";
+            String answer = "";
+            if (matchPatternQA.find()) {
+                question = matchPatternQA.group(1) + "_________" + matchPatternQA.group(3);
+                answer = matchPatternQA.group(2);
             }
+            this.questions.add(question);
+            this.answers.add(answer);
         }
     }
 
     public List<String> getExercise() {
         return this.questionsAnswers;
-    }
-    public String getAuthor() {
-        return author;
     }
     private String generateAnswers() {
         StringBuilder answers = new StringBuilder();

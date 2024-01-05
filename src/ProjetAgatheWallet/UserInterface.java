@@ -1,11 +1,7 @@
 package ProjetAgatheWallet;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
-import java.util.function.ToLongBiFunction;
+import java.util.*;
 
 public class UserInterface {
     private User currentUser;
@@ -77,7 +73,7 @@ public class UserInterface {
                 Role roleUser = null;
                 Language languageUser = null;
                 Level lvlUser = null;
-                float progressUser = 0;
+                Map<Level, List<Float>> progressUser = new HashMap<>();
 
                 System.out.println("Are you :");
                 System.out.println("1. A student");
@@ -136,10 +132,17 @@ public class UserInterface {
                                 System.out.println("Invalid choice. Please try again.");
                             }
                         }
+
+                        List<Float> scores = new ArrayList<>();
+                        scores.add((float) 0);
+                        progressUser.put(lvlUser, scores);
                         wrongChoice = false;
                     } else if (secondChoice == 2) {
                         roleUser = Role.TEACHER;
                         lvlUser = Level.EXPERT;
+                        List<Float> scores = new ArrayList<>();
+                        scores.add((float) 0);
+                        progressUser.put(lvlUser, scores);
                         System.out.println();
                         System.out.println("Which language are you teaching:");
                         System.out.println("1. French");
@@ -169,7 +172,7 @@ public class UserInterface {
                     }
                 }
 
-                String[] userData = {idUser, nameUser, passwordUser, String.valueOf(roleUser), String.valueOf(languageUser), String.valueOf(lvlUser), String.valueOf(progressUser)};
+                String[] userData = {idUser, nameUser, passwordUser, String.valueOf(roleUser), String.valueOf(languageUser), String.valueOf(lvlUser), tools.mapToString(progressUser)};
                 currentUser = new User(userData);
                 usersDatabase.addUser(userData);
                 continueRunning = false;
@@ -299,19 +302,59 @@ public class UserInterface {
     public void displayMainMenuTeacher() throws IOException {
         boolean continueRunning = true;
         while (continueRunning) {
+            System.out.println();
             System.out.println("What do you want to do today?");
             System.out.println("1. Manage my exercises");
             System.out.println("2. See the students progress");
             System.out.println("3. See my profile");
             System.out.println("4. Update my profile");
             System.out.println("5. Logout");
-            // System.out.println("6. Delete my account"); // à voir
+            System.out.println("6. Delete my account");
 
             int choice = scanner.nextInt();
             scanner.nextLine();
             switch (choice) {
                 case 1:
-                    System.out.println("coming soon...");
+                    System.out.println();
+                    System.out.println("Choose a level: ");
+                    System.out.println("1. Beginner");
+                    System.out.println("2. Intermediate");
+                    System.out.println("3. Advanced");
+                    int levelChoice = scanner.nextInt();
+                    scanner.nextLine();
+                    Level lvlToModify = Level.BEGINNER;
+                    boolean wrongChoice = true;
+                    while (wrongChoice) {
+                        if (levelChoice == 1) {
+                            wrongChoice = false;
+                        } else if (levelChoice == 2) {
+                            lvlToModify = Level.INTERMEDIATE;
+                            wrongChoice = false;
+                        } else if (levelChoice == 3) {
+                            lvlToModify = Level.ADVANCED;
+                            wrongChoice = false;
+                        } else {
+                            System.out.println("This option is not available, please try again.");
+                        }
+                    }
+
+                    System.out.println("Choose an option: ");
+                    System.out.println("1. Create a new exercise");
+                    System.out.println("2. Modify/delete an exercise");
+                    System.out.println("3. Set or modify the score to pass a level");
+                    int thirdChoice = scanner.nextInt();
+                    scanner.nextLine();
+                    ExercisesManager exoMan = new ExercisesManager();
+                    switch (thirdChoice) {
+                        case 1:
+                            exoMan.createNewExercise(currentUser.getLanguage(), lvlToModify);
+                            break;
+                        case 2:
+                            exoMan.modifyExercise(currentUser.getLanguage(), lvlToModify);
+                            break;
+                        case 3:
+                            exoMan.setScoreToUpdateLevel(currentUser.getLanguage(), lvlToModify);
+                    }
                     break;
                 case 2:
                     for (User student : usersInfos) {
@@ -338,9 +381,4 @@ public class UserInterface {
             }
         }
     }
-
-//
-//    public void navigateToExercise() {
-//        //TODO
-//    }
 }
