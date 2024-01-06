@@ -35,7 +35,7 @@ public class Database {
         return usersInfo;
     }
 
-    public void addUser(String[] userD) {
+    public void addUser(String[] userD) throws IOException{
         User newUser = new User(userD);
         this.usersInfo.add(newUser);
         String id = newUser.getId();

@@ -1,5 +1,6 @@
 package ProjetAgatheWallet;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,13 +11,13 @@ public class User {
     private String name;
     private String password;
     private Role role;
-    protected Database db;
     private Language language;
     private Level lvl;
     private Map<Level, List<Float>> progress;
     private Tools tool = new Tools();
+    private static Scanner scanner = new Scanner(System.in);
 
-    public User(String[] userInfo){
+    public User(String[] userInfo) {
         this.id = userInfo[0];
         this.name = userInfo[1];
         this.password = userInfo[2];
@@ -81,6 +82,7 @@ public class User {
         scoreList.add(newScore);
     }
 
+    
     public void setLevel(Level newLevel) {
         this.lvl = newLevel;
         List<Float> newScoreList = new ArrayList<>();
@@ -88,56 +90,53 @@ public class User {
         progress.put(newLevel, newScoreList);
     }
 
+    /**
+     * Renvoie le score actuel de l'utilisateur pour son niveau actuel.
+     * @return le score actuel de l'utilisateur.
+     */
     public float getCurrentScore() {
         List<Float> scoreList = progress.get(lvl);
         return scoreList.get(scoreList.size() - 1);
     }
 
-    public void updateProfile() {
-        Scanner scanner = new Scanner(System.in);
-        boolean continueRunning = true;
+    public void updateProfile() throws IOException {
+        Database db = new Database();
+        System.out.println("Which information would you like to update?");
+        System.out.println("1. Update id");
+        System.out.println("2. Update name");
+        System.out.println("3. Change password");
 
-        while (continueRunning) {
-            System.out.println("Which information would you like to update?");
-            System.out.println("1. Update id");
-            System.out.println("2. Update name");
-            System.out.println("3. Change password");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
 
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-                case 1:
+        switch (choice) {
+            case 1:
+                boolean existingID = true;
+                while (existingID) {
                     System.out.println("What is your new id/username?");
                     String newId = scanner.nextLine();
                     List<String> idList = db.getIdList();
-                    boolean existingID = true;
-                    while (existingID) {
-                        if (!idList.contains(id)) {
-                            setId(newId);
-                            existingID = false;
-                        } else {
-                            System.out.println("This id is already taken, please choose another one.");
-                        }
+                    if (idList.contains(newId)) {
+                        System.out.println(idList);
+                        System.out.println("This id is already taken, please choose another one.");
+                    } else {
+                        setId(newId);
+                        existingID = false;
                     }
-                    continueRunning = false;
-                    break;
-                case 2:
-                    System.out.println("What is your name?");
-                    String newName = scanner.nextLine();
-                    setName(newName);
-                    continueRunning = false;
-                    break;
-                case 3:
-                    System.out.println("What is your new password?");
-                    String newPassword = scanner.nextLine();
-                    setPassword(newPassword);
-                    continueRunning = false;
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
-            }
+                }
+                break;
+            case 2:
+                System.out.println("What is your name?");
+                String newName = scanner.nextLine();
+                setName(newName);
+                break;
+            case 3:
+                System.out.println("What is your new password?");
+                String newPassword = scanner.nextLine();
+                setPassword(newPassword);
+                break;
+            default:
+                System.out.println("Invalid choice. Please try again.");
         }
-        scanner.close();
     }
 }

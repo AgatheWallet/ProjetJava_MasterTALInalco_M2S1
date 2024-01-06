@@ -21,7 +21,7 @@ public class UserInterface {
         System.out.println();
     }
 
-    public User logInSignIn() {
+    public User logInSignIn() throws IOException {
         boolean continueRunning = true;
         while (continueRunning) {
             System.out.println();
@@ -304,7 +304,7 @@ public class UserInterface {
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
-        }
+        } scanner.close();
     }
 
     public void displayMainMenuTeacher() throws IOException {
@@ -355,6 +355,7 @@ public class UserInterface {
                     System.out.println("3. Set or modify the score to pass a level");
                     int thirdChoice = scanner.nextInt();
                     scanner.nextLine();
+
                     switch (thirdChoice) {
                         case 1:
                             exoMan.createNewExercise(lvlToModify);
@@ -365,13 +366,20 @@ public class UserInterface {
                         case 3:
                             lvlMan.setScoreToUpdateLevel(lvlToModify);
                             break;
+                        default:
+                            System.out.println("This option is not available. Please try again.");
                     }
                     break;
                 case 2:
+                    boolean stu = false;
                     for (User student : usersInfos) {
                         if (student.getRole().equals(Role.STUDENT) && student.getLanguage().equals(currentUser.getLanguage())) {
+                            stu = true;
                             System.out.println("Student " + student.getName() + ": " + student.getLevel() + " level with " + student.getCurrentScore());
                         }
+                    }
+                    if (!stu){
+                        System.out.println("There are no students learning " + currentUser.getLanguage() + " yet.");
                     }
                     break;
                 case 3:
@@ -390,6 +398,6 @@ public class UserInterface {
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
-        }
+        } scanner.close();
     }
 }
