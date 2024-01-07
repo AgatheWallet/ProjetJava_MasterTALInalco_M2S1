@@ -3,6 +3,11 @@ package ProjetAgatheWallet;
 import java.io.IOException;
 import java.util.*;
 
+
+/**
+ * Cette classe gère l'interface utilisateur. C'est via cette classe que toutes les grandes opérations
+ * vont avoir lieu
+ */
 public class UserInterface {
     private User currentUser;
     private Database usersDatabase = new Database();
@@ -12,6 +17,12 @@ public class UserInterface {
     private Tools tools = new Tools();
 
 
+    /**
+     * Constructeur de la classe UserInterface.
+     * Affiche un message de bienvenue et les options pour se connecter ou créer un compte.
+     * @throws IOException si une erreur d'entrée/sortie se produit,
+     * notamment au niveau de l'utilisation de la base de données
+     */
     public UserInterface() throws IOException {
         System.out.println();
         System.out.println("Welcome on our learning app.");
@@ -21,6 +32,12 @@ public class UserInterface {
         System.out.println();
     }
 
+    /**
+     * Gère le processus de connexion ou de création de compte de l'utilisateur.
+     * @return L'utilisateur connecté ou créé.
+     * @throws IOException si une erreur d'entrée/sortie se produit lors de l'utilisation de
+     * la base de données
+     */
     public User logInSignIn() throws IOException {
         boolean continueRunning = true;
         while (continueRunning) {
@@ -33,6 +50,7 @@ public class UserInterface {
             scanner.nextLine(); // Nettoyer le buffer
 
             if (choice == 1) {
+                // Connexion
                 System.out.println("Enter your id:");
                 String id = scanner.nextLine();
 
@@ -52,12 +70,14 @@ public class UserInterface {
                     System.out.println("Id or/and password wrong. Please try again.");
                 }
             } else if (choice == 2) {
-                String idUser = null;
+                // Création d'un nouveau compte
+                String idUser = "";
                 boolean alreadyExists = true;
                 while (alreadyExists) {
                     System.out.println();
                     System.out.println("Choose an id:");
                     idUser = scanner.nextLine();
+                    // Vérification que l'Id n'existe pas
                     if (!idList.contains(idUser)) {
                         alreadyExists = false;
                     } else {
@@ -86,6 +106,7 @@ public class UserInterface {
 
                 while (wrongChoice) {
                     if (secondChoice == 1) {
+                        // Pour un étudiant
                         roleUser = Role.STUDENT;
                         System.out.println();
                         System.out.println("Which language do you want to learn?");
@@ -139,6 +160,7 @@ public class UserInterface {
                         progressUser.put(lvlUser, scores);
                         wrongChoice = false;
                     } else if (secondChoice == 2) {
+                        // Pour un enseignant
                         roleUser = Role.TEACHER;
                         lvlUser = Level.EXPERT;
                         List<Float> scores = new ArrayList<>();
@@ -173,6 +195,7 @@ public class UserInterface {
                     }
                 }
 
+                // Création de l'utilisateur
                 String[] userData = {idUser, nameUser, passwordUser, String.valueOf(roleUser), String.valueOf(languageUser), String.valueOf(lvlUser), tools.mapToString(progressUser)};
                 currentUser = new User(userData);
                 usersDatabase.addUser(userData);
@@ -183,9 +206,14 @@ public class UserInterface {
         }
         System.out.println();
         System.out.println("Welcome (back) " + currentUser.getName());
+        // L'utilisateur est connecté
         return currentUser;
     }
 
+    /**
+     * Affiche le menu principal des étudiants et gère les différentes options
+     * @throws IOException si il y a une erreur au moment de la manipulation des fichiers utilisés
+     */
     public void displayMainMenuStudent() throws IOException {
         LevelManager lvlMan = new LevelManager(currentUser.getLanguage());
         boolean continueRunning = true;
@@ -203,7 +231,10 @@ public class UserInterface {
             scanner.nextLine();
             switch (choice) {
                 case 1:
+                    // Faire un exercice
                     Level exerciseLevel = currentUser.getLevel();
+
+                    // Si l'étudiant est au niveau intermédiaire ou avancé, il peut choisir un niveau inférieur
                     if (currentUser.getLevel().equals(Level.INTERMEDIATE)) {
                         System.out.println();
                         System.out.println("Please choose the desired level for the exercise by typing the corresponding number:");
@@ -254,42 +285,56 @@ public class UserInterface {
 
                     Exercise exo = new Exercise(currentUser.getLanguage(), exerciseLevel);
                     System.out.println();
+                    // Génération de l'exercice dans la langue de l'utilisateur au niveau choisi
                     exo.generate();
                     int nbOfQuestions = exo.getNumberofQuestion();
+
+                    // On récupère les réponses de l'utilisateur
                     List<String> answers = new ArrayList<>();
                     for (int i = 1; i <= nbOfQuestions; i++) {
                         System.out.println(i + ".");
                         answers.add(scanner.nextLine());
                     }
+
+                    // On évalue l'exercice et on ajoute le score dans la Map Progress
                     float score = exo.evaluate(answers);
                     currentUser.addScore(exerciseLevel,score);
+
+                    // Passage de niveau si l'étudiant a obtenu un score suffisant
                     if (exerciseLevel.equals(currentUser.getLanguage()) && score > lvlMan.getLevelUpdateScore(currentUser.getLevel())) {
                         lvlMan.getNextLevel(currentUser);
                         System.out.println("Congratulations, your level has been upgraded to " + currentUser.getLevel());
                     }
-                    usersDatabase.updateDatabase(currentUser);
+
+                    // On update la base de données
+                    usersDatabase.updateDatabase(currentUser, currentUser.getId());
                     break;
                 case 2:
+                    // Voir ses progrès
                     System.out.println();
                     System.out.println("Your level is " + currentUser.getLevel() + " with a score of " + currentUser.getCurrentScore());
                     System.out.println("Here is a view of your progress: " + tools.mapToString(currentUser.getProgress()));
                     break;
                 case 3:
+                    // Voir son profil
                     System.out.println();
                     currentUser.getUserProfile();
                     break;
                 case 4:
-                    System.out.println();
+                    // Modifier son profil (id, nom ou mot de passe uniquement)
+                    String oldID = currentUser.getId();
                     currentUser.updateProfile();
-                    usersDatabase.updateDatabase(currentUser);
+                    usersDatabase.updateDatabase(currentUser, oldID);
                     break;
                 case 5:
+                    // Se déconnecter
                     System.out.println();
                     System.out.println("Thank you for your visit. See you soon.");
                     currentUser = null;
                     continueRunning=false;
                     break;
                 case 6:
+                    // Supprimer son compte
                     System.out.println();
                     System.out.println("Are you sure you want to delete your account? Please answer by typing 'yes' or 'no'.");
                     String deleteConfirmation = scanner.nextLine();
@@ -307,6 +352,11 @@ public class UserInterface {
         } scanner.close();
     }
 
+
+    /**
+     * Affiche le menu principal des enseignants et gère les différentes options
+     * @throws IOException si il y a une erreur au moment de la manipulation des fichiers utilisés
+     */
     public void displayMainMenuTeacher() throws IOException {
         ExercisesManager exoMan = new ExercisesManager(currentUser.getLanguage());
         LevelManager lvlMan = new LevelManager(currentUser.getLanguage());
@@ -325,6 +375,9 @@ public class UserInterface {
             scanner.nextLine();
             switch (choice) {
                 case 1:
+                    // Gérer les exercices
+
+                    // Choix du niveau à modifier
                     Level lvlToModify = Level.BEGINNER;
                     boolean wrongChoice = true;
                     while (wrongChoice) {
@@ -347,30 +400,38 @@ public class UserInterface {
                             System.out.println("This option is not available, please try again.");
                         }
                     }
+                    wrongChoice=true;
 
-                    System.out.println();
-                    System.out.println("Choose an option: ");
-                    System.out.println("1. Create a new exercise");
-                    System.out.println("2. Modify/delete an exercise");
-                    System.out.println("3. Set or modify the score to pass a level");
-                    int thirdChoice = scanner.nextInt();
-                    scanner.nextLine();
+                    // Choix de la modification à apporter pour le niveau choisi dans la langue enseignée
+                    while (wrongChoice) {
+                        System.out.println();
+                        System.out.println("Choose an option: ");
+                        System.out.println("1. Create a new exercise");
+                        System.out.println("2. Modify/delete an exercise");
+                        System.out.println("3. Set or modify the score to pass a level");
+                        int thirdChoice = scanner.nextInt();
+                        scanner.nextLine();
 
-                    switch (thirdChoice) {
-                        case 1:
-                            exoMan.createNewExercise(lvlToModify);
-                            break;
-                        case 2:
-                            exoMan.modifyExercise(lvlToModify);
-                            break;
-                        case 3:
-                            lvlMan.setScoreToUpdateLevel(lvlToModify);
-                            break;
-                        default:
-                            System.out.println("This option is not available. Please try again.");
+                        switch (thirdChoice) {
+                            case 1:
+                                exoMan.createNewExercise(lvlToModify);
+                                wrongChoice = false;
+                                break;
+                            case 2:
+                                exoMan.modifyExercise(lvlToModify);
+                                wrongChoice = false;
+                                break;
+                            case 3:
+                                lvlMan.setScoreToUpdateLevel(lvlToModify);
+                                wrongChoice = false;
+                                break;
+                            default:
+                                System.out.println("This option is not available. Please try again.");
+                        }
                     }
                     break;
                 case 2:
+                    // Afficher le progrès des étudiants
                     boolean stu = false;
                     for (User student : usersInfos) {
                         if (student.getRole().equals(Role.STUDENT) && student.getLanguage().equals(currentUser.getLanguage())) {
@@ -378,22 +439,48 @@ public class UserInterface {
                             System.out.println("Student " + student.getName() + ": " + student.getLevel() + " level with " + student.getCurrentScore());
                         }
                     }
+
+                    // S'il n'y a pas d'étudiants dans cette langue
                     if (!stu){
                         System.out.println("There are no students learning " + currentUser.getLanguage() + " yet.");
                     }
                     break;
+
                 case 3:
+                    // Voir son profil
                     currentUser.getUserProfile();
                     break;
+
                 case 4:
+                    // Modifier son profil (id, nom, mot de passe uniquement)
+                    String oldID = currentUser.getId();
                     currentUser.updateProfile();
-                    usersDatabase.updateDatabase(currentUser);
+                    System.out.println(oldID);
+                    System.out.println(currentUser.getId());
+                    usersDatabase.updateDatabase(currentUser, oldID);
                     break;
+
                 case 5:
+                    // Se déconnecter
                     System.out.println();
                     System.out.println("Thank you for your visit. See you soon.");
                     currentUser = null;
                     continueRunning=false;
+                    break;
+
+                case 6:
+                    // Supprimer son compte
+                    System.out.println();
+                    System.out.println("Are you sure you want to delete your account? Please answer by typing 'yes' or 'no'.");
+                    String deleteConfirmation = scanner.nextLine();
+                    if (deleteConfirmation.equalsIgnoreCase("yes")) {
+                        usersDatabase.deleteAccount(currentUser);
+                        System.out.println("We're sorry to see you go. We hope you enjoyed learning with us. Please come back anytime :)");
+                        currentUser = null;
+                        continueRunning=false;
+                    } else {
+                        System.out.println("Deleting account cancelled.");
+                    }
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");

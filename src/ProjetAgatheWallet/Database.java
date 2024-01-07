@@ -1,16 +1,24 @@
 package ProjetAgatheWallet;
 
-import javax.tools.Tool;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Gère la base de données des utilisateurs de l'application
+ */
 public class Database {
     private List<User> usersInfo ;
     protected List<String> idList;
     private File database = new File("src/ProjetAgatheWallet/usersDataBase.csv");
     private Tools tools = new Tools();
 
+    /**
+     * Construction de la classe Database
+     * @throws IOException si une erreur se produit au moment de la manipulation du fichier de
+     * base de données
+     */
     public Database() throws IOException {
         String separator = "\t";
         BufferedReader br = new BufferedReader(new FileReader(database));
@@ -18,6 +26,7 @@ public class Database {
         this.idList = new ArrayList<>();
         this.usersInfo = new ArrayList<>();
 
+        // Lecture des informations ligne par ligne : une ligne = un utilisateur
         while ((line = br.readLine()) != null) {
             String[] lineInfo = line.split(separator);
             String id = lineInfo[0];
@@ -27,14 +36,28 @@ public class Database {
         br.close();
     }
 
+    /**
+     * Récupère la liste des identifiants des utilisateurs utilisant l'application
+     * @return la liste des identifiants
+     */
     public List<String> getIdList() {
         return idList;
     }
 
+    /**
+     * Récupère la liste des informations des utilisateurs
+     * @return la liste des utilisateurs et leurs informations
+     */
     public List<User> getUsersInfo(){
         return usersInfo;
     }
 
+    /**
+     * Permet d'ajouter un nouvel utilisateur à la base de données
+     * @param userD correspond aux informations de l'utilisateur à ajouter
+     * @throws IOException si une erreur se produit au moment de la manipulation du fichier de
+     * base de données
+     */
     public void addUser(String[] userD) throws IOException{
         User newUser = new User(userD);
         this.usersInfo.add(newUser);
@@ -48,14 +71,22 @@ public class Database {
         }
     }
 
-    public void updateDatabase(User currentUser) throws IOException {
+    /**
+     * Met à jour les informations de l'utilisateur dans la base de données
+     * @param currentUser correspond à l'utilisateur pour lequel on modifie les informations
+     * @param oldID l'ancien ID si celui-ci a été modifié pour retrouver l'utilisateur dans la
+     *              base de données
+     * @throws IOException si une erreur se produit au moment de la manipulation du fichier de
+     * base de données
+     */
+    public void updateDatabase(User currentUser, String oldID) throws IOException {
         File tempFile = new File("src/ProjetAgatheWallet/tempfile.csv");
         BufferedReader reader = new BufferedReader(new FileReader(database));
         BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
 
         String line;
         while ((line = reader.readLine()) != null) {
-            if (line.startsWith(currentUser.getId())) {
+            if (line.startsWith(oldID)) {
                 StringBuilder newUserInfo = new StringBuilder();
                 for (String info : currentUser.getUser()) {
                     newUserInfo.append(info).append("\t");
@@ -78,6 +109,12 @@ public class Database {
         }
     }
 
+    /**
+     * Supprime le compte de l'utilisateur de la base de données
+     * @param currentUser correspond à l'utilisateur à supprimer de la base de données
+     * @throws IOException si une erreur se produit au moment de la manipulation du fichier de
+     * base de données
+     */
     public void deleteAccount(User currentUser) throws IOException {
         File tempFile = new File("src/ProjetAgatheWallet/tempfile.csv");
         BufferedReader reader = new BufferedReader(new FileReader(database));
@@ -87,8 +124,8 @@ public class Database {
         while ((line = reader.readLine()) != null) {
             if (! line.startsWith(currentUser.getId())) {
                 writer.write(line);
+                writer.newLine();
             }
-            writer.newLine();
         }
         reader.close();
         writer.close();
